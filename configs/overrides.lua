@@ -24,6 +24,7 @@ M.treesitter = {
 		"lua",
 		"markdown_inline",
 		"markdown",
+		"php",
 		"python",
 		"typescript",
 		"vim",
@@ -55,12 +56,18 @@ M.mason = {
 		"prettier",
 		"prettierd",
 		-- java
-		"java-language-server",
+		"jdtls",
+		-- c/cpp stuff
+		"clangd",
+		"clang-format",
 		-- azure
-		"azure-pipelines-language-server",
+		-- "azure-pipelines-language-server",
 		-- bash
 		"shellcheck",
 		"bash-language-server",
+		--php
+		"phpactor",
+		"php-debug-adapter",
 		-- python
 		"pyright",
 		"flake8",
