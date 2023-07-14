@@ -13,10 +13,13 @@ lspconfig.pyright.setup({
 	},
 })
 
--- Java
+-- jdtls is a sh script in path which bootsup jdtls
+-- yay -S jdtls (for pacman based systems)
 lspconfig.jdtls.setup({
+	autostart = false,
+	cmd = { "jdtls", "-data", workspace },
 	capabilities = capabilities,
-	flags = lsp_flags,
+	flags = { debounce_text_changes = 500 },
 	on_attach = on_attach,
 	filetypes = {
 		"java",
