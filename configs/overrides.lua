@@ -59,6 +59,8 @@ M.mason = {
 		"prettierd",
 		-- java
 		"jdtls",
+		"java-test",
+		"google-java-format",
 		-- c/cpp stuff
 		"clangd",
 		"clang-format",

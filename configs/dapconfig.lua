@@ -45,23 +45,29 @@ dap.configurations.php = {
 }
 
 -- Java
-dap.adapters.java = function(callback)
-  callback {
+dap.adapters.java = {
     type = "server",
     host = "127.0.0.1",
     port = 5005,
-  }
-end
-
-dap.configurations.java = {
-  {
-    type = "java",
-    request = "attach",
-    name = "Debug (Attach) - Remote",
-    hostName = "127.0.0.1",
-    port = 5005,
-  },
 }
+
+--Java debugger adapter settings
+dap.configurations.java = {
+   {
+      name = "Debug (Attach) - Remote",
+      type = "java",
+      request = "attach",
+      hostName = "127.0.0.1",
+      port = 5005,
+   },
+   {
+      name = "Debug Non-Project class",
+      type = "java",
+      request = "launch",
+      program = "${file}",
+   },
+}
+
 
 -- Rust/C/C++
 dap.adapters.codelldb = {

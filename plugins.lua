@@ -1,4 +1,5 @@
 local overrides = require("custom.configs.overrides")
+local null_ls_cfg = require("custom.configs.null-ls")
 
 ---@type NvPluginSpec[]
 local plugins = {
@@ -6,11 +7,17 @@ local plugins = {
 		"christoomey/vim-tmux-navigator",
 		lazy = false,
 	},
-	{
-		"github/copilot.vim",
-		lazy = false,
-		config = function() end,
-	},
+-- 	{
+-- 		"github/copilot.vim",
+-- 		lazy = false,
+-- 		config = function() end,
+-- 	},
+-- 	{
+-- 		"zbirenbaum/copilot.lua",
+-- 		cmd = "Copilot",
+-- 		event = "InsertEnter",
+-- 		opts = overrides.copilot,
+-- 	},
 	{
 		"williamboman/mason.nvim",
 		opts = overrides.mason,
@@ -28,18 +35,11 @@ local plugins = {
 	},
 	{
 		"jose-elias-alvarez/null-ls.nvim",
-		ft = {
-			"go",
-			"python",
-			"lua",
-			"javascript",
-			"typescript",
-			"typescriptreact",
-			"javascriptreact",
-		},
+		ft = null_ls_cfg.ft,
 		opts = function()
-			local custom_null_ls = require("custom.configs.null-ls")
-			return custom_null_ls
+			local null_ls = require("null-ls")
+			local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+			return null_ls_cfg.opts(null_ls, augroup)
 		end,
 	},
 	{
@@ -92,12 +92,6 @@ local plugins = {
 		config = function()
 			require("autoclose").setup()
 		end,
-	},
-	{
-		"zbirenbaum/copilot.lua",
-		cmd = "Copilot",
-		event = "InsertEnter",
-		opts = overrides.copilot,
 	},
 	{
 		"hrsh7th/nvim-cmp",
