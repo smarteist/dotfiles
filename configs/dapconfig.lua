@@ -43,7 +43,6 @@ dap.configurations.php = {
     serverSourceRoot = vim.fn.getcwd() .. '/',
     -- stopOnEntry = true,
     ignore = {
-      '**/silverstripe-cache/**/*.php',
       '**/vendor/**/*.php',
     },
     hostname = '0.0.0.0',
@@ -54,7 +53,7 @@ dap.configurations.php = {
     request = 'launch',
     program = '${file}',
     cwd = '${fileDirname}',
-    port = 9000,
+    port = 9003,
   },
 }
 
