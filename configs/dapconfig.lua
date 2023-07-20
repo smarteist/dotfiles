@@ -1,5 +1,31 @@
 local dap = require 'dap'
 
+vim.api.nvim_set_hl(0, 'red', { fg = '#ed0d09' })
+vim.api.nvim_set_hl(0, 'green', { fg = '#9ece6a' })
+vim.api.nvim_set_hl(0, 'yellow', { fg = '#FFFF00' })
+vim.api.nvim_set_hl(0, 'orange', { fg = '#f09000' })
+
+vim.fn.sign_define(
+  'DapBreakpoint',
+  { text = '', texthl = 'red', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+)
+vim.fn.sign_define(
+  'DapBreakpointCondition',
+  { text = '', texthl = 'red', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+)
+vim.fn.sign_define(
+  'DapBreakpointRejected',
+  { text = '⏹', texthl = 'orange', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+)
+vim.fn.sign_define(
+  'DapStopped',
+  { text = '', texthl = 'green', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+)
+vim.fn.sign_define(
+  'DapLogPoint',
+  { text = '', texthl = 'yellow', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+)
+
 -- Python
 dap.adapters.python = {
   type = 'executable',
@@ -45,7 +71,7 @@ dap.configurations.php = {
     ignore = {
       '**/vendor/**/*.php',
     },
-    hostname = '0.0.0.0',
+    hostname = '127.0.0.1',
   },
   {
     name = 'Launch currently open script',
@@ -64,7 +90,6 @@ dap.adapters.java = {
   port = 5005,
 }
 
---Java debugger adapter settings
 dap.configurations.java = {
   {
     name = 'Debug (Attach) - Remote',
