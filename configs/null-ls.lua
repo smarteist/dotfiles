@@ -39,7 +39,7 @@ cfg.opts = function(null_ls, augroup)
       null_ls.builtins.formatting.phpcsfixer.with { filetypes = { 'html', 'php', 'phtml' } },
 
       -- java
-      null_ls.builtins.formatting.google_java_format,
+      null_ls.builtins.formatting.google_java_format.with { extra_args = { '--aosp' } },
 
       -- python
       null_ls.builtins.formatting.black,

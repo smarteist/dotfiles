@@ -21,7 +21,7 @@ lspconfig.jdtls.setup {
   filetypes = {
     'java',
   },
-  root_dir = lspconfig.util.root_pattern('pom.xml', 'gradle.build', '.git'),
+  root_dir = lspconfig.util.root_pattern(".git", "mvnw", "gradlew", "pom.xml", "build.gradle"),
   flags = {
     allow_incremental_sync = true,
   },
