@@ -1,8 +1,12 @@
+-- This file needs to have same structure as nvconfig.lua
+-- https://github.com/NvChad/ui/blob/v2.5/lua/nvconfig.lua
+
 ---@type ChadrcConfig
 local M = {}
 
 -- Path to overriding theme and highlights files
-local highlights = require("custom.highlights")
+local highlights = require("highlights")
+
 
 M.ui = {
 	theme = "onedark",
@@ -38,8 +42,5 @@ M.ui = {
 		},
 	},
 }
-
-M.plugins = "custom.plugins"
-M.mappings = require("custom.mappings")
 
 return M

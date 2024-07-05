@@ -71,9 +71,10 @@ M.mason = {
     -- "azure-pipelines-language-server",
     -- bash
     'shellcheck',
-    'bash-language-server',
+     -- you can turn off/on auto_update per tool
+    { 'bash-language-server', auto_update = true },
     'shfmt',
-    --php
+    -- php
     'phpactor',
     'php-debug-adapter',
     'php-cs-fixer',

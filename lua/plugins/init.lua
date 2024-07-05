@@ -1,8 +1,16 @@
-local overrides = require("custom.configs.overrides")
-local null_ls_cfg = require("custom.configs.null-ls")
+
+local overrides = require("configs.overrides")
+local null_ls_cfg = require("configs.null-ls")
 
 ---@type NvPluginSpec[]
 local plugins = {
+	{
+		"stevearc/conform.nvim",
+		-- event = 'BufWritePre', -- uncomment for format on save
+		config = function()
+		require "configs.conform"
+		end,
+	},
 	{
 		"christoomey/vim-tmux-navigator",
 		lazy = false,
@@ -19,8 +27,13 @@ local plugins = {
 -- 		opts = overrides.copilot,
 -- 	},
 	{
-		"williamboman/mason.nvim",
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		dependencies = {
+			{ "williamboman/mason.nvim", opts = true },
+			{ "williamboman/mason-lspconfig.nvim", opts = true },
+		},
 		opts = overrides.mason,
+		lazy = false,
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -29,8 +42,8 @@ local plugins = {
 	{
 		"neovim/nvim-lspconfig",
 		config = function()
-			require("plugins.configs.lspconfig")
-			require("custom.configs.lspconfig")
+			require("nvchad.configs.lspconfig").defaults()
+			require "configs.lspconfig"
 		end,
 	},
 	{
@@ -54,15 +67,15 @@ local plugins = {
 	{
 		"mfussenegger/nvim-dap",
 		config = function()
-			require "custom.configs.dapconfig"
-		end,
-		init = function()
-			require("core.utils").load_mappings("dap")
+			require("configs.dapconfig")
 		end,
 	},
 	{
 		"rcarriga/nvim-dap-ui",
-		dependencies = "mfussenegger/nvim-dap",
+		dependencies = {
+			"mfussenegger/nvim-dap",
+			"nvim-neotest/nvim-nio",
+		},
 		config = function()
 			local dap = require("dap")
 			local dapui = require("dapui")

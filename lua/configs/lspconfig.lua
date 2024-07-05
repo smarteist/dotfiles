@@ -1,8 +1,11 @@
-local on_attach = require('plugins.configs.lspconfig').on_attach
-local capabilities = require('plugins.configs.lspconfig').capabilities
+-- EXAMPLE
+local on_attach = require("nvchad.configs.lspconfig").on_attach
+local on_init = require("nvchad.configs.lspconfig").on_init
+local capabilities = require("nvchad.configs.lspconfig").capabilities
 
 local lspconfig = require 'lspconfig'
 local util = require 'lspconfig/util'
+
 
 -- Python
 lspconfig.pyright.setup {
@@ -107,9 +110,11 @@ lspconfig.rust_analyzer.setup {
   root_dir = lspconfig.util.root_pattern 'Cargo.toml',
 }
 
+
 -- JS TS ...
 lspconfig.tsserver.setup {
   on_attach = on_attach,
+  on_init = on_init,
   capabilities = capabilities,
   cmd = {
     'typescript-language-server',

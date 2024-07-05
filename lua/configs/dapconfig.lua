@@ -56,7 +56,7 @@ dap.adapters.php = {
   type = 'executable',
   command = 'node',
   args = {
-    require('mason-registry').get_package('php-debug-adapter'):get_install_path() .. '/extension/out/phpDebug.js',
+    vim.fn.stdpath('data') .. '/mason/packages/php-debug-adapter/extension/out/phpDebug.js',
   },
 }
 
@@ -112,7 +112,7 @@ dap.adapters.codelldb = {
   port = '${port}',
   executable = {
     -- CHANGE THIS to your path!
-    command = require('mason-registry').get_package('codelldb'):get_install_path() .. '/extension/adapter/codelldb',
+    command = vim.fn.stdpath('data') .. '/mason/packages/codelldb/extension/codelldb',
     args = { '--port', '${port}' },
 
     -- On windows you may have to uncomment this:

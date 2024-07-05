@@ -1,17 +1,47 @@
-local g = vim.g
-local opt = vim.opt
-local HOME = os.getenv("HOME")
--- local autocmd = vim.api.nvim_create_autocmd
+vim.g.base46_cache = vim.fn.stdpath "data" .. "/nvchad/base46/"
+vim.g.mapleader = " "
 
--- Auto resize panes when resizing nvim window
--- autocmd("VimResized", {
---   pattern = "*",
---   command = "tabdo wincmd =",
--- })
+-- bootstrap lazy and all plugins
+local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 
-opt.fileformat = "unix"
-opt.fileformats = "unix,dos,mac"
-opt.wildignore = "wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,.DS_Store"
+if not vim.loop.fs_stat(lazypath) then
+  local repo = "https://github.com/folke/lazy.nvim.git"
+  vim.fn.system { "git", "clone", "--filter=blob:none", repo, "--branch=stable", lazypath }
+end
 
-g.copilot_assume_mapped = true
-g.tmux_navigator_save_on_switch = 2
+vim.opt.rtp:prepend(lazypath)
+
+local lazy_config = require "configs.lazy"
+
+-- load plugins
+require("lazy").setup({
+  {
+    "NvChad/NvChad",
+    lazy = false,
+    branch = "v2.5",
+    import = "nvchad.plugins",
+    config = function()
+      require "options"
+    end,
+  },
+
+  { import = "plugins" },
+}, lazy_config)
+
+-- run mason MasonInstallAll first time
+local mason_path = vim.fn.stdpath("data") .. "/mason/packages"
+local is_mason_empty = vim.fn.empty(vim.fn.globpath(mason_path, "*")) == 1
+
+if is_mason_empty then
+    vim.cmd("MasonToolsInstall")
+end
+
+-- load theme
+dofile(vim.g.base46_cache .. "defaults")
+dofile(vim.g.base46_cache .. "statusline")
+
+require "nvchad.autocmds"
+
+vim.schedule(function()
+  require "mappings"
+end)
