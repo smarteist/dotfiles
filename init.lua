@@ -28,19 +28,14 @@ require("lazy").setup({
   { import = "plugins" },
 }, lazy_config)
 
--- run mason MasonInstallAll first time
-local mason_path = vim.fn.stdpath("data") .. "/mason/packages"
-local is_mason_empty = vim.fn.empty(vim.fn.globpath(mason_path, "*")) == 1
-
-if is_mason_empty then
-    vim.cmd("MasonToolsInstall")
-end
-
 -- load theme
 dofile(vim.g.base46_cache .. "defaults")
 dofile(vim.g.base46_cache .. "statusline")
 
 require "nvchad.autocmds"
+
+-- run mason MasonToolsInstall
+vim.cmd("MasonToolsInstall")
 
 vim.schedule(function()
   require "mappings"
