@@ -9,8 +9,8 @@ local highlights = require('highlights')
 
 -- base-46 color palette theming
 M.base46 = {
-  theme = 'gatekeeper',
-  theme_toggle = { 'gatekeeper', 'one_light' },
+  theme = 'onedark',
+  theme_toggle = { 'onedark', 'one_light' },
   hl_override = highlights.override,
   hl_add = highlights.add,
   tabufline = {
