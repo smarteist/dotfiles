@@ -33,6 +33,16 @@ return {
     -- ----- Python (Pyright) -----
     setup_server('pyright', {
       filetypes = { 'python' },
+      settings = {
+        python = {
+          analysis = {
+            diagnosticSeverityOverrides = {
+              reportMissingImports = 'none',
+              -- reportUnusedVariable = 'none',
+            },
+          },
+        },
+      },
     })
 
     -- ----- Java (jdtls) -----
