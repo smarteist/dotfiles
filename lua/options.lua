@@ -30,6 +30,6 @@ o.guicursor = 'i-ci:ver25-blinkwait500-blinkon500-blinkoff500'
 o.background = 'dark'
 o.signcolumn = 'yes'
 o.cursorline = true
-o.relativenumber = true
+o.relativenumber = false
 o.colorcolumn = '80'
 o.previewheight = 30
