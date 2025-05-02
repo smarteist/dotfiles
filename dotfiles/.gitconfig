@@ -1,0 +1,6 @@
+[user]
+	name = ali
+	email = ali.hosseini.sr@gmail.com
+[core]
+	autocrlf = input
+	fileMode = false

@@ -1,9 +1,28 @@
-# my_nvim_conf
+# My Personal Dotfiles
 
-This is my neovim configurations based on NvChad Interface
+Keeping my terminal, editor, and Git configs in one place—symlinked into `~` with [GNU Stow](https://www.gnu.org/software/stow/).
 
-#### Run This to install:
+---
+
+## 🔍 What’s Inside
+
+- **dotfiles/** → `~/*`
+- **scripts/** → helper scripts (not stowed)  
+- **install.sh** → bootstrap installer  
+- **needs.txt** → list of system packages to install  
+
+Each folder is a “package”: running `stow bash` makes `bash/.bashrc → ~/.bashrc`, and so on.
+
+---
+
+## 🚀 Quick Start
 
 ```bash
-git clone https://github.com/smarteist/my_nvim_conf ~/.config/nvim && nvim
-```
+# 1. Clone
+git clone https://github.com/smarteist/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+
+# 2. Bootstrap
+./install.sh # stow all packages
+# or, target specific ones:
+./install.sh dotfiles

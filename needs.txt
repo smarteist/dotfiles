@@ -1,0 +1,5 @@
+stow
+curl
+git
+nvim
+wezterm
