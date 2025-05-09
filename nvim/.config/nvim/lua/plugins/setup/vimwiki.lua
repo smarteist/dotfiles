@@ -1,5 +1,5 @@
 return {
-  'vimwiki/vimwiki',
-  lazy = false,
-  config = function() end,
+    'vimwiki/vimwiki',
+    lazy = false,
+    config = function() end,
 }
