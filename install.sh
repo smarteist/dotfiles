@@ -1,95 +1,89 @@
 #!/usr/bin/env bash
-#
-# Bootstrap the whole dot-files suite with GNU Stow.
-# Dependencies to install should be listed one-per-line in needs.txt
-# Run from inside the repo root:   ./install.sh [pkg …]
-#
+
 set -euo pipefail
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP_DIR="${HOME}/.dotfile_backups/$(date +%Y%m%d_%H%M%S)"
-PKGS=("$@") # user-supplied package list
 
-# ---- helpers ---------------------------------------------------------------
-err()  { printf "\e[31m%s\e[0m\n" "$*" >&2; }
-note() { printf "\e[32m%s\e[0m\n" "$*"; }
+# ANSI colours (POSIX-portable)
+RED=$'\e[31m'
+GREEN=$'\e[32m'
+RESET=$'\e[0m'
+
+log() { printf '%s%s%s\n' "$GREEN" "$*" "$RESET"; }
+err() { printf '%s%s%s\n' "$RED" "$*" "$RESET" >&2; }
 
 need() {
-	command -v "$1" &>/dev/null && return
-	err "Missing dependency '$1'. Trying to install…"
-	if command -v apt-get &>/dev/null; then
-		sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
-		sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "$1"
-	elif command -v apt &>/dev/null; then
-		sudo DEBIAN_FRONTEND=noninteractive apt update -qq
-		sudo DEBIAN_FRONTEND=noninteractive apt install -y "$1"
-	elif command -v dnf &>/dev/null; then
-		sudo dnf install -y "$1"
-	elif command -v pacman &>/dev/null; then
-		sudo pacman -Sy --noconfirm "$1"
-	elif command -v brew &>/dev/null; then
-		brew install "$1"
-	else
-		err "No supported package manager found; please install '$1' manually."
-		exit 1
-	fi
+    local bin=$1
+
+    command -v "$bin" &>/dev/null && return # already present
+
+    err "Missing dependency: $bin — attempting install…"
+
+    local mgr
+    for mgr in apt-get apt dnf pacman brew; do
+        command -v "$mgr" &>/dev/null || continue
+        case $mgr in
+        apt-get | apt)
+            sudo DEBIAN_FRONTEND=noninteractive "$mgr" update -qq
+            sudo DEBIAN_FRONTEND=noninteractive "$mgr" install -y "$bin"
+            ;;
+        dnf) sudo dnf install -y "$bin" ;;
+        pacman) sudo pacman -Sy --noconfirm "$bin" ;;
+        brew) brew install "$bin" ;;
+        esac
+        return
+    done
+
+    err "No supported package manager found. Please install ‘$bin’ manually."
+    exit 1
+}
+
+install_deps_file() {
+    local file=$1
+    [[ -f $file ]] || return
+    log "Installing dependencies listed in ${file}"
+    # Grep removes blank lines and comments
+    grep -Ev '^\s*(#|$)' "$file" | while read -r dep; do need "$dep"; done
 }
 
 backup_if_conflict() {
-  local file="$1"
-  if [[ -e "${HOME}/${file}" || -L "${HOME}/${file}" ]]; then
-    mkdir -p "${BACKUP_DIR}"
-    mv -v "${HOME}/${file}" "${BACKUP_DIR}/"
-  fi
+    local path=$1
+    # Only back up real files/dirs, not symlinks
+    [[ -e $path && ! -L $path ]] || return
+    mkdir -p -- "$BACKUP_DIR"
+    mv -v -- "$path" "$BACKUP_DIR/"
 }
 
-# ---- install global deps from file ----------------------------------------
-DEPS_FILE="${REPO_DIR}/needs.txt"
-if [[ -f "${DEPS_FILE}" ]]; then
-  note "Installing dependencies from ${DEPS_FILE}…"
-  while IFS= read -r dep || [[ -n "$dep" ]]; do
-    # strip comments and whitespace
-    dep="${dep%%#*}"
-    dep="${dep##*( )}"
-    dep="${dep%%*( )}"
-    [[ -z "$dep" ]] && continue
-    need "$dep"
-  done < "${DEPS_FILE}"
-fi
-
-# ---- main ------------------------------------------------------------------
-need "stow"
-cd "${REPO_DIR}"
-
-# Default package list = every first-level dir that is not scripts/ or .git
-if [[ ${#PKGS[@]} -eq 0 ]]; then
-  mapfile -t PKGS < <(
-    find . -maxdepth 1 -type d \
-      -not -path '.' \
-      -not -name '.git' \
-      -not -name 'scripts' \
-      -printf '%P\n'
-  )
-fi
-
-note "Backing up any conflicting files to: ${BACKUP_DIR}"
-
-for pkg in "${PKGS[@]}"; do
-  while IFS= read -r -d '' file; do
-    rel="${file#"${pkg}"/}"       # strip leading "pkg/"
-    if [[ "${rel}" == .* ]]; then
-      target="${rel}"
+discover_pkgs() {
+    if [[ $# -gt 0 ]]; then
+        printf '%s\n' "$@"
     else
-      target=".${rel}"
+        find . -maxdepth 1 -type d ! -name '.' \
+            ! -name '.git' ! -name 'scripts' -printf '%P\n'
     fi
-    backup_if_conflict "${target}"
-  done < <(find "${pkg}" -type f -print0)
-done
+}
 
-note "Stowing packages: ${PKGS[*]}"
-stow -v \
-      -d "${REPO_DIR}" \
-      -t "${HOME}" \
-      "${PKGS[@]}"
+main() {
+    install_deps_file "${REPO_DIR}/needs.txt"
+    need stow
 
-note "All done 🎉"
+    cd -- "$REPO_DIR"
+    mapfile -t PKGS < <(discover_pkgs "$@")
+
+    log "Backing up conflicts to: $BACKUP_DIR"
+    for pkg in "${PKGS[@]}"; do
+        while IFS= read -r -d '' file; do
+            rel="${file#"$pkg"/}"
+            target="${HOME}/.${rel#.}" # always dot-prefix
+            backup_if_conflict "$target"
+        done < <(find "$pkg" -type f -print0)
+    done
+
+    log "Stowing packages: ${PKGS[*]}"
+    stow -v -d "$REPO_DIR" -t "$HOME" "${PKGS[@]}"
+
+    log "All done 🎉"
+}
+
+main "$@"
