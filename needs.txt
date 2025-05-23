@@ -1,5 +1,6 @@
 stow
 curl
 git
+zsh
 nvim
 wezterm
