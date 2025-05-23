@@ -48,19 +48,26 @@ install_deps_file() {
 }
 
 backup_if_conflict() {
-    local path=$1
-    # Only back up real files/dirs, not symlinks
-    [[ -e $path && ! -L $path ]] || return
-    mkdir -p -- "$BACKUP_DIR"
-    mv -v -- "$path" "$BACKUP_DIR/"
+    local path="${1%/}"
+    # Skip if it's a symlink or doesn't exist.
+    if [ -h "$path" ] || [ ! -e "$path" ]; then
+        [ -h "$path" ] && log "Skipping symlink: $path"
+        return 0
+    fi
+    # Remove the $HOME prefix (if present) to generate a relative path.
+    local rel="${path#$HOME/}"
+    # Create the target directory under $BACKUP_DIR and move the file/dir.
+    local dest_dir="$BACKUP_DIR/$(dirname "$rel")"
+    mkdir -p -- "$dest_dir"
+    mv -v -- "$path" "$dest_dir/"
 }
+
 
 discover_pkgs() {
     if [[ $# -gt 0 ]]; then
         printf '%s\n' "$@"
     else
-        find . -maxdepth 1 -type d ! -name '.' \
-            ! -name '.git' ! -name 'scripts' -printf '%P\n'
+        find . -maxdepth 1 -type d ! -name '.' ! -name '.git' ! -name 'scripts' -printf '%P\n'
     fi
 }
 
