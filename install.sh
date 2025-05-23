@@ -15,12 +15,10 @@ err() { printf '%s%s%s\n' "$RED" "$*" "$RESET" >&2; }
 
 need() {
     local bin=$1
-
-    command -v "$bin" &>/dev/null && return # already present
+    command -v "$bin" &>/dev/null && return
 
     err "Missing dependency: $bin — attempting install…"
 
-    local mgr
     for mgr in apt-get apt dnf pacman brew; do
         command -v "$mgr" &>/dev/null || continue
         case $mgr in
@@ -43,25 +41,34 @@ install_deps_file() {
     local file=$1
     [[ -f $file ]] || return
     log "Installing dependencies listed in ${file}"
-    # Grep removes blank lines and comments
     grep -Ev '^\s*(#|$)' "$file" | while read -r dep; do need "$dep"; done
 }
 
 backup_if_conflict() {
     local path="${1%/}"
-    # Skip if it's a symlink or doesn't exist.
-    if [ -h "$path" ] || [ ! -e "$path" ]; then
+
+    # Skip if it doesn’t exist or is itself a symlink
+    if [ ! -e "$path" ] || [ -h "$path" ]; then
         [ -h "$path" ] && log "Skipping symlink: $path"
         return 0
     fi
-    # Remove the $HOME prefix (if present) to generate a relative path.
+
+    # Skip if any parent directory of $path is a symlink
+    local dir="$path"
+    while [ "$dir" != "$HOME" ] && [ "$dir" != "/" ]; do
+        dir=$(dirname "$dir")
+        if [ -h "$dir" ]; then
+            log "Skipping (parent is symlink): $path ← $dir"
+            return 0
+        fi
+    done
+
+    # Compute relative path under $HOME and move it into $BACKUP_DIR
     local rel="${path#$HOME/}"
-    # Create the target directory under $BACKUP_DIR and move the file/dir.
     local dest_dir="$BACKUP_DIR/$(dirname "$rel")"
     mkdir -p -- "$dest_dir"
     mv -v -- "$path" "$dest_dir/"
 }
-
 
 discover_pkgs() {
     if [[ $# -gt 0 ]]; then
@@ -82,7 +89,7 @@ main() {
     for pkg in "${PKGS[@]}"; do
         while IFS= read -r -d '' file; do
             rel="${file#"$pkg"/}"
-            target="${HOME}/.${rel#.}" # always dot-prefix
+            target="${HOME}/.${rel#.}" # always dot-prefixed
             backup_if_conflict "$target"
         done < <(find "$pkg" -type f -print0)
     done
