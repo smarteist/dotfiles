@@ -2,6 +2,9 @@
 # ~/.bashrc
 #
 
+alias myip="curl -s https://1.1.1.1/cdn-cgi/trace | grep '^ip=' | cut -d= -f2"
+
+
 #export PATH="$HOME/.pyenv/bin:$PATH"
 #export PATH="/usr/local/bin:$PATH"
 
@@ -10,14 +13,15 @@
 #export CPPFLAGS="-I/usr/local/opt/zlib/include -I/usr/local/opt/bzip2/include"
 
 
-export JAVA_HOME='/usr/lib/jvm/java-21-openjdk'
-export ANDROID_SDK_ROOT="$HOME/Android/sdk"
-export ANDROID_HOME="$HOME/Android/sdk"
+#export JAVA_HOME='/usr/lib/jvm/java-21-openjdk'
+export JAVA_HOME="$(readlink -f /usr/bin/java | sed 's:/bin/java$::')"
+export ANDROID_SDK_ROOT="$HOME/Android/Sdk"
+export ANDROID_HOME="$HOME/Android/Sdk"
 export PATH=$PATH:$ANDROID_SDK_ROOT/platform-tools/
 export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin/
 export PATH=$PATH:$ANDROID_ROOT/emulator
 export PATH=$PATH:$ANDROID_SDK_ROOT/tools/
-export PATH="$PATH:$HOME/Android/flutter/bin/:/opt/trelliscli/:$JAVA_HOME/bin"
+#export PATH="$PATH:$HOME/Android/flutter/bin/:/opt/trelliscli/:$JAVA_HOME/bin"
 
 # LaTeX settings
 #export MANPATH="$MANPATH:/usr/local/texlive/$(date +'%Y')/texmf-dist/doc/man"

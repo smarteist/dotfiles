@@ -5,7 +5,7 @@ set -x
 
 # drill short txt ch whoami.cloudflare @1.0.0.1 | sed -e '/^;;/d' -e '/^$/d' | cut -d '"' -f2
 
-PUBLIC_IP=$(curl -s https://www.cloudflare.com/cdn-cgi/trace | grep '^ip=' | cut -d= -f2)
+PUBLIC_IP=$(curl -s https://1.1.1.1/cdn-cgi/trace | grep '^ip=' | cut -d= -f2)
 INTERFACE=$(ip route list | awk '/^default/ {print $5}')
 IPETH=$(ip -o -f inet addr show $INTERFACE | awk '{print $4}'| cut -d "/" -f1)
 MASK=$(ip -o -f inet addr show $INTERFACE | awk '{print $4}'| cut -d "/" -f2)
