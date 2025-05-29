@@ -3,9 +3,12 @@ return {
     ft = {
         'go',
         'c',
+        'cpp',
+        'h',
+        'hpp',
+        'proto',
         'rust',
         'bash',
-        'cpp',
         'python',
         'lua',
         'java',
