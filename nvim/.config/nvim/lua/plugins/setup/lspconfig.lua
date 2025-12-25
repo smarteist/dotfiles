@@ -1,33 +1,40 @@
 return {
     'neovim/nvim-lspconfig',
+    dependencies = {
+        'williamboman/mason.nvim',
+    },
     config = function()
-        -- ================================
-        --        Require Necessary Modules
-        -- ================================
-        local lspconfig = require('lspconfig')
-        local util = require('lspconfig/util')
+        local util = require('lspconfig.util')
 
-        -- Import NvChad's LSP settings
+        -- NvChad Settings
         local lsp_settings = require('nvchad.configs.lspconfig')
         local on_attach = lsp_settings.on_attach
         local on_init = lsp_settings.on_init
         local lsp_flags = lsp_settings.lsp_flags
         local extendedClientCapabilities = lsp_settings.extendedClientCapabilities
 
-        -- Enhance capabilities with nvim-cmp
         local capabilities = vim.lsp.protocol.make_client_capabilities()
         capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
-        -- ================================
-        --           LSP Server Configurations
-        -- ================================
-
-        -- Helper function to reduce repetition
+        -- Reusable setup function
         local function setup_server(server_name, config)
             config = config or {}
-            config.on_attach = on_attach
-            config.capabilities = capabilities
-            lspconfig[server_name].setup(config)
+
+            -- Merge defaults
+            config.on_attach = config.on_attach or on_attach
+            config.capabilities = config.capabilities or capabilities
+            config.flags = config.flags or lsp_flags
+            config.on_init = config.on_init or on_init
+
+            -- Check custom cmd
+            if config.cmd and vim.fn.executable(config.cmd[1]) == 0 then
+                vim.notify('Mason tool not found: ' .. config.cmd[1], vim.log.levels.ERROR)
+                return
+            end
+
+            -- Register and Enable
+            vim.lsp.config(server_name, config)
+            vim.lsp.enable(server_name)
         end
 
         -- ----- Python (Pyright) -----
@@ -38,18 +45,20 @@ return {
                     analysis = {
                         diagnosticSeverityOverrides = {
                             reportMissingImports = 'none',
-                            -- reportUnusedVariable = 'none',
                         },
                     },
                 },
             },
+            root_dir = util.root_pattern('pyproject.toml', 'requirements.txt', 'Pipfile', 'poetry.lock', '.git')(
+                vim.fn.getcwd()
+            ),
         })
 
         -- ----- Java (jdtls) -----
         setup_server('jdtls', {
-            flags = lsp_flags,
             filetypes = { 'java' },
-            root_dir = util.root_pattern('.git', 'mvnw', 'gradlew', 'pom.xml', 'build.gradle'),
+            -- Explicit root_dir override
+            root_dir = util.root_pattern('mvnw', 'gradlew', 'pom.xml', 'build.gradle', '.git')(vim.fn.getcwd()),
             settings = {
                 java = {
                     eclipse = { downloadSources = true },
@@ -96,19 +105,12 @@ return {
                 },
             },
             init_options = {
-                bundles = {}, -- Add paths to jar files if using additional eclipse.jdt.ls plugins
+                bundles = {},
             },
         })
 
-        -- ----- Rust (rust_analyzer) -----
-        setup_server('rust_analyzer', {
-            filetypes = { 'rust' },
-            root_dir = util.root_pattern('Cargo.toml'),
-        })
-
-        -- ----- TypeScript & JavaScript (tsserver) -----
+        -- ----- TypeScript & JavaScript (ts_ls) -----
         setup_server('ts_ls', {
-            on_init = on_init,
             cmd = { 'typescript-language-server', '--stdio' },
             filetypes = {
                 'javascript',
@@ -118,34 +120,32 @@ return {
                 'typescriptreact',
                 'typescript.tsx',
             },
-            root_dir = function()
-                return util.root_pattern('package.json', 'tsconfig.json', 'jsconfig.json', '.git')(vim.fn.getcwd())
-            end,
+            root_dir = util.root_pattern('package.json', 'tsconfig.json', 'jsconfig.json', '.git')(vim.fn.getcwd()),
         })
 
         -- ----- PHP (phpactor) -----
         setup_server('phpactor', {
             filetypes = { 'php' },
-            root_dir = function()
-                return vim.loop.cwd()
-            end,
+            root_dir = util.root_pattern(
+                'composer.json',
+                'composer.lock',
+                'phpunit.xml',
+                'phpunit.xml.dist',
+                'artisan',
+                '.git'
+            )(vim.fn.getcwd()),
         })
 
         -- ----- HTML (html) -----
         setup_server('html', {
             filetypes = { 'html' },
-            root_dir = function()
-                return vim.loop.cwd()
-            end,
+            root_dir = util.root_pattern('.git')(vim.fn.getcwd()),
         })
 
         -- ----- CSS/SASS/SCSS (cssls) -----
         setup_server('cssls', {
-            flags = lsp_flags,
             filetypes = { 'css', 'sass', 'scss' },
-            root_dir = function()
-                return vim.loop.cwd()
-            end,
+            root_dir = util.root_pattern('.git')(vim.fn.getcwd()),
         })
 
         -- ----- Emmet (emmet_ls) -----
@@ -162,6 +162,32 @@ return {
             },
         })
 
-        -- Add additional LSP server configurations here following the same pattern
+        -- ----- Lua (lua_ls) -----
+        setup_server('lua_ls', {
+            settings = {
+                Lua = {
+                    diagnostics = { globals = { 'vim' } },
+                },
+            },
+        })
+
+        -- ----- C/C++ (clangd) -----
+        setup_server('clangd', {
+            filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda', 'proto' },
+            root_dir = util.root_pattern(
+                '.clangd',
+                '.clang-tidy',
+                '.clang-format',
+                'compile_commands.json',
+                'compile_flags.txt',
+                'configure.ac',
+                '.git'
+            )(vim.fn.getcwd()),
+        })
+
+        -- ----- Bash (bashls) -----
+        setup_server('bashls', {
+            filetypes = { 'sh', 'bash', 'zsh' },
+        })
     end,
 }

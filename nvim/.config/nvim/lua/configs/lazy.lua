@@ -2,6 +2,11 @@ return {
     defaults = { lazy = true },
     install = { colorscheme = { 'nvchad' } },
 
+    rocks = {
+        enabled = false,
+        hererocks = false,
+    },
+
     ui = {
         icons = {
             ft = '',

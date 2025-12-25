@@ -34,9 +34,6 @@ dofile(vim.g.base46_cache .. 'statusline')
 
 require('nvchad.autocmds')
 
--- run mason MasonToolsInstall
-vim.cmd('MasonToolsInstall')
-
 vim.schedule(function()
     require('mappings')
 end)

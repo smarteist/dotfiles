@@ -1,5 +1,8 @@
 return {
     'nvimtools/none-ls.nvim',
+    dependencies = {
+        'williamboman/mason.nvim',
+    },
     ft = {
         'go',
         'c',

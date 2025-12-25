@@ -4,7 +4,6 @@ local plugins = {
     require('plugins.setup.base46'),
     require('plugins.setup.colorizer'),
     require('plugins.setup.conform'),
-    require('plugins.setup.copilot'),
     require('plugins.setup.dap_ui'),
     require('plugins.setup.dapconfig'),
     require('plugins.setup.lspconfig'),
@@ -16,6 +15,7 @@ local plugins = {
     require('plugins.setup.ui'),
     require('plugins.setup.vimwiki'),
     require('plugins.setup.whichkey'),
+    require('plugins.setup.copilot'),
 }
 
 return plugins

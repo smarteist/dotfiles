@@ -1,11 +1,18 @@
 return {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
     dependencies = {
-        { 'williamboman/mason.nvim',           opts = true },
-        { 'williamboman/mason-lspconfig.nvim', opts = true },
+        { 'williamboman/mason.nvim' },
+        { 'williamboman/mason-lspconfig.nvim' },
     },
     lazy = false,
     opts = {
+        integrations = {
+            ['mason-lspconfig'] = true,
+            ['mason-null-ls'] = true,
+            ['mason-nvim-dap'] = true,
+        },
+        run_on_start = true,
+        start_delay = 4000,
         ensure_installed = {
             -- Lua
             'lua-language-server',
@@ -14,7 +21,6 @@ return {
             'css-lsp',
             'html-lsp',
             'typescript-language-server',
-            'deno',
             'prettier',
             'prettierd',
             'emmet-ls',

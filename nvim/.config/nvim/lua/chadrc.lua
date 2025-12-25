@@ -13,9 +13,14 @@ M.base46 = {
     theme_toggle = { 'onedark', 'one_light' },
     hl_override = highlights.override,
     hl_add = highlights.add,
+}
+
+M.ui = {
     tabufline = {
-        enable = true,
+        enabled = true,
         lazyload = false,
+        order = { 'treeOffset', 'buffers', 'tabs', 'btns' },
+        modules = nil,
     },
 }
 

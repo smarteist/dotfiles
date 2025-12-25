@@ -145,6 +145,7 @@ config.keys = {
     { key = 'S',        mods = 'CTRL|SHIFT', action = wezterm.action.PasteFrom('Clipboard') },
     { key = 'T',        mods = 'CTRL|SHIFT', action = wezterm.action.SpawnTab('CurrentPaneDomain') },
     { key = 'N',        mods = 'CTRL|SHIFT', action = wezterm.action.SpawnWindow },
+    { key = 'X',        mods = 'CTRL|SHIFT', action = wezterm.action.ActivateCopyMode },
     { key = 'PageUp',   mods = 'SHIFT',      action = wezterm.action.ScrollByPage(-1) },
     { key = 'PageDown', mods = 'SHIFT',      action = wezterm.action.ScrollByPage(1) },
     { key = 'Home',     mods = 'SHIFT',      action = wezterm.action.ScrollToTop },
