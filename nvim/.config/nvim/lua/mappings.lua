@@ -26,5 +26,5 @@ map('n', '<leader>dr', "<cmd>lua require('dap').repl.toggle()<CR>", { desc = 'To
 map('n', '<leader>dw', "<cmd>lua require('dap.ui.widgets').hover()<CR>", { desc = 'Widgets' })
 
 map('n', '<leader>dpr', function()
-    require('dap-python').test_method()
+  require('dap-python').test_method()
 end, { desc = 'DAP Python Test Method' })
