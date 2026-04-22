@@ -1,0 +1,89 @@
+[window]
+dimensions = { columns = 120, lines = 30 } # init size
+padding = { x = 3, y = 3 } # symmetric padding
+opacity = 0.95
+decorations = "Full"
+startup_mode = "Maximized" # maximize on start
+
+[scrolling]
+history = 9999
+
+[font]
+size = 10.0
+
+[font.normal]
+family = "Hack Nerd Font Mono"
+style = "Regular"
+
+[font.bold]
+family = "Hack Nerd Font Mono"
+style = "Bold"
+
+[font.italic]
+family = "Hack Nerd Font Mono"
+style = "Italic"
+
+[font.bold_italic]
+family = "Hack Nerd Font Mono"
+style = "Bold Italic"
+
+[colors.primary]
+foreground = "#dcdfe4"
+background = "#282c34"
+
+[colors.cursor]
+text = "#282c34"
+cursor = "#a3b3cc"
+
+[colors.selection]
+text = "#dcdfe4"
+background = "#474e5d"
+
+[colors.normal]
+black = "#282c34"
+red = "#e06c75"
+green = "#98c379"
+yellow = "#e5c07b"
+blue = "#61afef"
+magenta = "#c678dd"
+cyan = "#56b6c2"
+white = "#dcdfe4"
+
+[colors.bright]
+black = "#3E4451"
+red = "#E06C75"
+green = "#98C379"
+yellow = "#E5C07B"
+blue = "#61AFEF"
+magenta = "#C678DD"
+cyan = "#56B6C2"
+white = "#DCDFE4"
+
+[bell]
+animation = "EaseOut" # visual bell hook
+duration = 150
+color = "#E9B32A"
+# bell notification
+command = { program = "notify-send", args = ["Terminal Bell", "Task finished", "--icon=utilities-terminal", "--app-name=Alacritty"] }
+
+[cursor]
+style = { shape = "Block", blinking = "On" } # BlinkingBlock
+blink_interval = 150
+
+[terminal]
+shell = "/usr/bin/zsh"
+
+[keyboard]
+bindings = [
+  { key = "W", mods = "Control|Shift", action = "Quit" }, # no native tabs
+  { key = "S", mods = "Control|Shift", action = "Paste" },
+  { key = "T", mods = "Control|Shift", action = "CreateNewWindow" }, # tab fallback
+  { key = "N", mods = "Control|Shift", action = "CreateNewWindow" },
+  { key = "X", mods = "Control|Shift", action = "ToggleViMode" }, # copy mode fallback
+  { key = "PageUp", mods = "Shift", action = "ScrollPageUp" },
+  { key = "PageDown", mods = "Shift", action = "ScrollPageDown" },
+  { key = "Home", mods = "Shift", action = "ScrollToTop" },
+  { key = "End", mods = "Shift", action = "ScrollToBottom" },
+  { key = "Equals", mods = "Control|Shift", action = "IncreaseFontSize" },
+  { key = "Minus", mods = "Control|Shift", action = "DecreaseFontSize" }
+]
