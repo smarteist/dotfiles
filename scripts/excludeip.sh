@@ -1,31 +1,68 @@
 #!/bin/bash
-# List of IP addresses to exclude
-exclude_networks=(
-"49.13.56.130"
-"192.248.158.122"
+
+# Constants
+ROUTE_FILE="/proc/net/route"
+MIN_CIDR_LEN=7
+
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 <cidr_file1> [cidr_file2 ...]" >&2
+    exit 1
+fi
+
+# Parse /proc/net/route directly to match C logic exactly
+IFACE=""
+GW=""
+
+while read -r iface dest gw rest; do
+    # Skip header
+    if [ "$iface" = "Iface" ]; then continue; fi
+
+    # Check for default destination and non-zero gateway
+    if [ "$dest" = "00000000" ] && [ "$gw" != "00000000" ]; then
+        # Convert hex gateway string (little-endian) to IP address
+        printf -v o4 "%d" "0x${gw:0:2}"
+        printf -v o3 "%d" "0x${gw:2:2}"
+        printf -v o2 "%d" "0x${gw:4:2}"
+        printf -v o1 "%d" "0x${gw:6:2}"
+
+        GW="$o1.$o2.$o3.$o4"
+        IFACE="$iface"
+        break
+    fi
+done < "$ROUTE_FILE"
+
+if [ -z "$IFACE" ] || [ -z "$GW" ]; then
+    echo "No active interface found." >&2
+    exit 1
+fi
+
+echo "Interface: $IFACE, Gateway: $GW"
+
+# Build and execute route batch
+BATCH_CMDS=$(
+    for FILE in "$@"; do
+        if [ ! -f "$FILE" ]; then
+            echo "Cannot read $FILE" >&2
+            continue
+        fi
+
+        # Strip carriage returns and generate batch lines
+        awk -v gw="$GW" -v iface="$IFACE" -v min_len="$MIN_CIDR_LEN" '
+            {
+                sub(/\r$/, "", $0);
+                if (length($0) >= min_len) {
+                    print "route replace " $0 " via " gw " dev " iface
+                }
+            }
+        ' "$FILE"
+    done
 )
 
-# Delete any existing routes for the networks in the exclude list
-for net in "${exclude_networks[@]}"; do
-    sudo ip route del "$net" 2>/dev/null
-done
+NET_COUNT=$(echo -n "$BATCH_CMDS" | grep -c '^' || true)
 
-# Fetch all non-loopback, active network interfaces
-interfaces=$(ip -o link show up | awk -F': ' '{print $2}' | grep -v '^lo$')
-
-for iface in $interfaces; do
-    metric=$(ip route show dev "$iface" | awk '/metric/ {print $NF; exit}')
-
-    # Check if metric is a number and >= 100
-    if [[ "$metric" =~ ^[0-9]+$ ]] && (( metric >= 100 )); then
-        gateway=$(ip route show default dev "$iface" | awk '/default/ {print $3; exit}')
-
-        if [[ -n "$gateway" ]]; then
-            for net in "${exclude_networks[@]}"; do
-                echo "Adding route for $net via gateway $gateway on interface $iface"
-                sudo ip route add "$net" via "$gateway" dev "$iface"
-            done
-            break
-        fi
-    fi
-done
+# Apply routes in batch
+if [ "$NET_COUNT" -gt 0 ]; then
+    echo "Applying $NET_COUNT routes..."
+    echo "$BATCH_CMDS" | ip -batch -
+    echo "Configured routes for $NET_COUNT networks."
+fi
