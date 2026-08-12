@@ -4,3 +4,18 @@
 [core]
 	autocrlf = input
 	fileMode = false
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	dark = true
+	side-by-side = true
+	line-numbers = true
+	syntax-theme = Dracula
+[merge]
+	conflictStyle = zdiff3
+[diff]
+	algorithm = histogram
+[alias]
+	diffw = diff -w
